@@ -7,13 +7,12 @@ Author: Erik Toller
 
 import numpy as np
 import matplotlib.pyplot as plt
-from ipywidgets import IntProgress
+from ipywidgets as widgets
 from IPython.display import display
 import time
 
 def input_func():
-    import ipywidgets as widgets
-
+    # Create the x-axis slider
     sliderx = widgets.FloatRangeSlider(
         value=[-1, 1],
         min=-10,
@@ -26,6 +25,8 @@ def input_func():
         readout=True,
         readout_format='.1f',
     )
+    
+    # Create the y-axis slider
     slidery = widgets.FloatRangeSlider(
         value=[-1, 1],
         min=-10,
@@ -38,6 +39,8 @@ def input_func():
         readout=True,
         readout_format='.1f',
     )
+    
+    # Create the number of fractures slider
     slidernum = widgets.IntSlider(
         value=1,
         min=1,
@@ -55,11 +58,13 @@ def input_func():
 def rand_gen(n,xy_ax):
     # Assign 10 % more fractures to get ridd of boundary issues
     n = int(n*1.1+1)
+    
     # Generate random x values between the give axis and sort them
     # the x-axis on the right is increased by 10 % to make the netwokr fill the x-axis
     x = np.random.uniform(xy_ax[0],xy_ax[1]*1.1,[n,1])
     x = np.sort(x, axis=0)
-    # generate random y values between the givven axis
+    
+    # Generate random y values between the givven axis
     y = np.random.uniform(xy_ax[2],xy_ax[3],[n,1])
     z = x + y*1j
     return z
@@ -86,7 +91,7 @@ def collect_frac(num, xy_ax):
     z2 = np.zeros(num) + np.zeros(num)*1j
     
     # Setup progress bar
-    f = IntProgress(min=0, max=num, description="Generating") # instantiate the bar
+    f = widgets.IntProgress(min=0, max=num, description="Generating") # instantiate the bar
     display(f) # display the bar
     
     # Iterator to find the nearest un-used point
@@ -118,7 +123,7 @@ def plot_frac(z1, z2):
     plt.gca().set_aspect('equal')
     
     # Setup progress bar
-    f = IntProgress(min=0, max=len(X1), description="Plotting") # instantiate the bar
+    f = widgets.IntProgress(min=0, max=len(X1), description="Plotting") # instantiate the bar
     display(f) # display the bar
     
     # Plot each fracture as a line
@@ -135,6 +140,7 @@ def plot_frac(z1, z2):
 def plot_length(z1, z2):
     # Get the lengt hof all fractures
     L = length(z1, z2)
+    
     # Plot the lengths in a histogram
     plt.rcParams['figure.figsize'] = [15, 7]
     plt.hist(L, bins=30)
