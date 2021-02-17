@@ -11,7 +11,46 @@ from ipywidgets import IntProgress
 from IPython.display import display
 import time
 
-toolbar_width = 10
+def input_func():
+    import ipywidgets as widgets
+
+    sliderx = widgets.FloatRangeSlider(
+        value=[-1, 1],
+        min=-10,
+        max=10,
+        step=0.1,
+        description='x-axis:',
+        disabled=False,
+        continuous_update=False,
+        orientation='horizontal',
+        readout=True,
+        readout_format='.1f',
+    )
+    slidery = widgets.FloatRangeSlider(
+        value=[-1, 1],
+        min=-10,
+        max=10,
+        step=0.1,
+        description='y-axis:',
+        disabled=False,
+        continuous_update=False,
+        orientation='horizontal',
+        readout=True,
+        readout_format='.1f',
+    )
+    slidernum = widgets.IntSlider(
+        value=1,
+        min=1,
+        max=10000,
+        step=1,
+        description='Fractures:',
+        disabled=False,
+        continuous_update=False,
+        orientation='horizontal',
+        readout=True,
+        readout_format='d'
+    )
+    return sliderx, slidery, slidernum
 
 def rand_gen(n,xy_ax):
     # Assign 10 % more fractures to get ridd of boundary issues
@@ -100,3 +139,5 @@ def plot_length(z1, z2):
     plt.rcParams['figure.figsize'] = [15, 7]
     plt.hist(L, bins=30)
     plt.xlabel('Length');
+    strL = 'Number of fractures:' + str(len(L))
+    plt.title(strL)
