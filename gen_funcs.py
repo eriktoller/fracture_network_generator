@@ -7,9 +7,10 @@ Author: Erik Toller
 
 import numpy as np
 import matplotlib.pyplot as plt
-from ipywidgets as widgets
+import ipywidgets as widgets
 from IPython.display import display
 import time
+import csv
 
 def input_func():
     # Create the x-axis slider
@@ -42,8 +43,8 @@ def input_func():
     
     # Create the number of fractures slider
     slidernum = widgets.IntSlider(
-        value=1,
-        min=1,
+        value=10,
+        min=10,
         max=10000,
         step=1,
         description='Fractures:',
@@ -53,7 +54,15 @@ def input_func():
         readout=True,
         readout_format='d'
     )
-    return sliderx, slidery, slidernum
+    
+    # Creat the textbox for filename
+    textbox = widgets.Text(
+        value='frac_coord.csv',
+        placeholder='Type filename',
+        description='String:',
+        disabled=False
+    )
+    return sliderx, slidery, slidernum, textbox
 
 def rand_gen(n,xy_ax):
     # Assign 10 % more fractures to get ridd of boundary issues
@@ -147,3 +156,10 @@ def plot_length(z1, z2):
     plt.xlabel('Length');
     strL = 'Number of fractures:' + str(len(L))
     plt.title(strL)
+    
+def save_frac(z1,z2,name):
+    # Make the z1 z2 into on matrix
+    a = np.array(np.array([z1,z2]).T)
+    
+    # Save the matrix as a csv
+    np.savetxt(name, a, delimiter=",")
