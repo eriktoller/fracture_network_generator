@@ -59,7 +59,7 @@ def input_func():
     textbox = widgets.Text(
         value='frac_coord.csv',
         placeholder='Type filename',
-        description='String:',
+        description='Filename:',
         disabled=False
     )
     return sliderx, slidery, slidernum, textbox
