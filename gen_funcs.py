@@ -31,7 +31,9 @@ def distance(z):
     dist = np.linalg.norm(z - z[:,None], axis=-1)
     return dist
 
-def collect_frac(z, num, xy_ax):
+def collect_frac(num, xy_ax):
+    # Get random complex points z
+    z = rand_gen(num, xy_ax)
     # Calculate the distances between all points
     dist = distance(z)
     # Set up the arras as 0+0j initaly
