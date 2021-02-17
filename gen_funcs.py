@@ -7,7 +7,11 @@ Author: Erik Toller
 
 import numpy as np
 import matplotlib.pyplot as plt
+from ipywidgets import IntProgress
+from IPython.display import display
+import time
 
+toolbar_width = 10
 
 def rand_gen(n,xy_ax):
     # Assign 10 % more fractures to get ridd of boundary issues
@@ -34,11 +38,18 @@ def distance(z):
 def collect_frac(num, xy_ax):
     # Get random complex points z
     z = rand_gen(num, xy_ax)
+    
     # Calculate the distances between all points
     dist = distance(z)
+    
     # Set up the arras as 0+0j initaly
     z1 = np.zeros(num) + np.zeros(num)*1j
     z2 = np.zeros(num) + np.zeros(num)*1j
+    
+    # Setup progress bar
+    f = IntProgress(min=0, max=num, description="Generating") # instantiate the bar
+    display(f) # display the bar
+    
     # Iterator to find the nearest un-used point
     for pos in range(num):
         # Assing the starting point of fracutr n as z[n]
@@ -46,6 +57,9 @@ def collect_frac(num, xy_ax):
         # Find the nearest neighboor, but exclude all z that has been assigned as z1
         pos_min = np.where(dist[pos] == np.min(np.delete(dist[pos], np.arange(pos+1))))
         z2[pos] += z[pos_min]
+        # update the bar
+        f.value += 1 # signal to increment the progress bar
+    f.bar_style = "success"
     
     # Check if any x-positions are outside the boundary and if so move them to the boundary
     if any(z1.real > xy_ax[1]) == True:
@@ -59,12 +73,21 @@ def plot_frac(z1, z2):
     Y1 = [z1.imag for x in z1]
     X2 = [z2.real for x in z2]
     Y2 = [z2.imag for x in z2]
+    
     # Change the figure size and set the axis as equal
-    plt.rcParams['figure.figsize'] = [20, 20]
+    plt.rcParams['figure.figsize'] = [15, 15]
     plt.gca().set_aspect('equal')
+    
+    # Setup progress bar
+    f = IntProgress(min=0, max=len(X1), description="Plotting") # instantiate the bar
+    display(f) # display the bar
+    
     # Plot each fracture as a line
     for pos in range(len(X1)):
         plt.plot([X1[0][pos],X2[0][pos]],[Y1[0][pos],Y2[0][pos]], color='black')
+        f.value += 1 # signal to increment the progress bar
+    f.bar_style = "success"
+    
     # Turn off the axis and show the plot
     plt.axis('off')
     plt.show()
@@ -74,6 +97,6 @@ def plot_length(z1, z2):
     # Get the lengt hof all fractures
     L = length(z1, z2)
     # Plot the lengths in a histogram
-    plt.rcParams['figure.figsize'] = [20, 10]
+    plt.rcParams['figure.figsize'] = [15, 7]
     plt.hist(L, bins=30)
     plt.xlabel('Length');
