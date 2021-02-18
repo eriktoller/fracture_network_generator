@@ -1,7 +1,7 @@
+
 # -*- coding: utf-8 -*-
 """
 Created on Tue Feb 16 11:16:00 2021
-
 Author: Erik Toller
 """
 
@@ -43,8 +43,8 @@ def input_func():
     
     # Create the number of fractures slider
     slidernum = widgets.IntSlider(
-        value=10,
-        min=10,
+        value=100,
+        min=100,
         max=10000,
         step=1,
         description='Fractures:',
@@ -127,9 +127,9 @@ def plot_frac(z1, z2):
     X2 = [z2.real for x in z2]
     Y2 = [z2.imag for x in z2]
     
-    # Change the figure size and set the axis as equal
-    plt.rcParams['figure.figsize'] = [15, 15]
-    plt.gca().set_aspect('equal')
+    # Initiate figure
+    fig = plt.figure()
+    ax  = fig.add_subplot(111)
     
     # Setup progress bar
     f = widgets.IntProgress(min=0, max=len(X1), description="Plotting") # instantiate the bar
@@ -137,7 +137,7 @@ def plot_frac(z1, z2):
     
     # Plot each fracture as a line
     for pos in range(len(X1)):
-        plt.plot([X1[0][pos],X2[0][pos]],[Y1[0][pos],Y2[0][pos]], color='black')
+        ax.plot([X1[0][pos],X2[0][pos]],[Y1[0][pos],Y2[0][pos]], color='black')
         f.value += 1 # signal to increment the progress bar
     f.bar_style = "success"
     
@@ -150,12 +150,20 @@ def plot_length(z1, z2):
     # Get the lengt hof all fractures
     L = length(z1, z2)
     
+    # Initiate figure
+    fig = plt.figure()
+    ax  = fig.add_subplot(111)
+    
     # Plot the lengths in a histogram
-    plt.rcParams['figure.figsize'] = [15, 7]
-    plt.hist(L, bins=30)
-    plt.xlabel('Length');
     strL = 'Number of fractures:' + str(len(L))
-    plt.title(strL)
+    ax.hist(L, bins=30, label=strL, color='0.75')
+    ax.set_xlabel(r'Length $L$')
+    ax.legend(loc=0, frameon=False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.get_yaxis().set_ticks([])
+    plt.show()
     
 def save_frac(z1,z2,name):
     # Make the z1 z2 into on matrix
