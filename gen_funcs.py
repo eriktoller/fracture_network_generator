@@ -13,6 +13,19 @@ import time
 import csv
 
 def input_func():
+    """
+    input_func()
+    
+    This fucntion generates the input slider and textbox.
+    
+    Parameters
+    ----------
+    null
+
+    Returns
+    -------
+    input sliders and textbox
+    """
     # Create the x-axis slider
     sliderx = widgets.FloatRangeSlider(
         value=[-1, 1],
@@ -57,7 +70,7 @@ def input_func():
     
     # Creat the textbox for filename
     textbox = widgets.Text(
-        value='frac_coord.csv',
+        value='example',
         placeholder='Type filename',
         description='Filename:',
         disabled=False
@@ -65,6 +78,20 @@ def input_func():
     return sliderx, slidery, slidernum, textbox
 
 def rand_gen(n,xy_ax):
+    """
+    rand_gen(n,xy_ax)
+    
+    Generates a complex array z with n points inside the limits of xy_ax. The array is sorted in the x-direction.
+    
+    Parameters
+    ----------
+    n: int, number of points to generate
+    xy_ax: array, array with the x and y limits given as [xfrom xto yfrom yto]
+
+    Returns
+    -------
+    z: complex array bounded by xy_ax
+    """
     # Assign 10 % more fractures to get ridd of boundary issues
     n = int(n*1.1+1)
     
@@ -79,32 +106,74 @@ def rand_gen(n,xy_ax):
     return z
     
 def length(z1, z2):
+    """
+    length(z1, z2)
+    
+    Calcualtes the distance between complex points, i.e. length of each fracture.
+    
+    Parameters
+    ----------
+    z1: complex array, start points of fractures
+    z2: complex array, end points of fractures
+
+    Returns
+    -------
+    L: array, length of each fracture
+    """
     # Get the length of each fracture
     L = np.sqrt((z1 - z2)*np.conj(z1 - z2))
     return np.real(L)
 
 def distance(z):
+    """
+    distance(z)
+    
+    Calcualtes the distance between all points in a complex array.
+    
+    Parameters
+    ----------
+    z: complex array, 
+
+    Returns
+    -------
+    dist: array, NxN array which holds all distances between all of the complex points in z
+    """
     # get the distance between all points in a nxn martix where n=length(z)
     dist = np.linalg.norm(z - z[:,None], axis=-1)
     return dist
 
-def collect_frac(num, xy_ax):
+def collect_frac(n, xy_ax):
+    """
+    collect_frac(n,xy_ax)
+    
+    Generates a fracture network of n fractures bounded by xy_ax. It goes from min(x) to max(x) and assigns fractures a start and an end point. Each start point is assigned its nearest neighboor. once a start point is assigned it cannot be used as an end point for the following fractures, thus ensuring the the fractures do not intersect.
+    
+    Parameters
+    ----------
+    n: int, number of points to generate
+    xy_ax: array, array with the x and y limits given as [xfrom xto yfrom yto]
+
+    Returns
+    -------
+    z1: complex array, start points of fractures
+    z2: complex array, end points of fractures
+    """
     # Get random complex points z
-    z = rand_gen(num, xy_ax)
+    z = rand_gen(n, xy_ax)
     
     # Calculate the distances between all points
     dist = distance(z)
     
     # Set up the arras as 0+0j initaly
-    z1 = np.zeros(num) + np.zeros(num)*1j
-    z2 = np.zeros(num) + np.zeros(num)*1j
+    z1 = np.zeros(n) + np.zeros(n)*1j
+    z2 = np.zeros(n) + np.zeros(n)*1j
     
     # Setup progress bar
-    f = widgets.IntProgress(min=0, max=num, description="Generating") # instantiate the bar
+    f = widgets.IntProgress(min=0, max=n, description="Generating") # instantiate the bar
     display(f) # display the bar
     
     # Iterator to find the nearest un-used point
-    for pos in range(num):
+    for pos in range(n):
         # Assing the starting point of fracutr n as z[n]
         z1[pos] += z[pos]
         # Find the nearest neighboor, but exclude all z that has been assigned as z1
@@ -120,7 +189,22 @@ def collect_frac(num, xy_ax):
     
     return z1,z2
 
-def plot_frac(z1, z2):
+def plot_frac(z1, z2, name):
+    """
+    plot_frac(z1, z2)
+    
+    Plots all of the fractures in a single plot.
+    
+    Parameters
+    ----------
+    z1: complex array, start points of fractures
+    z2: complex array, end points of fractures
+    name: string, the name of the pdf-file.
+
+    Returns
+    -------
+    null
+    """
     # Convert the complex vectors to vectors of x and y
     X1 = [z1.real for x in z1]
     Y1 = [z1.imag for x in z1]
@@ -145,8 +229,27 @@ def plot_frac(z1, z2):
     plt.axis('off')
     plt.show()
     
+    # Save the figure as pdf
+    name = name + '_fractue_network.pdf'
+    fig.savefig(name, format='pdf', bbox_inches='tight')
     
-def plot_length(z1, z2):
+    
+def plot_length(z1, z2, name):
+    """
+    plot_length(z1, z2)
+    
+    Plots a histogram of the length distribution of all fractures.
+    
+    Parameters
+    ----------
+    z1: complex array, start points of fractures
+    z2: complex array, end points of fractures
+    name: string, the name of the pdf-file.
+
+    Returns
+    -------
+    null
+    """
     # Get the lengt hof all fractures
     L = length(z1, z2)
     
@@ -165,9 +268,32 @@ def plot_length(z1, z2):
     ax.get_yaxis().set_ticks([])
     plt.show()
     
+    # Save the figure as pdf
+    name = name + '_length_distrib.pdf'
+    fig.savefig(name, format='pdf', bbox_inches='tight')
+    
 def save_frac(z1,z2,name):
+    """
+    save_frac(z1, z2)
+    
+    Saves the start and end points of all fractures in a csv-file.
+    
+    Parameters
+    ----------
+    z1: complex array, start points of fractures
+    z2: complex array, end points of fractures
+    name: string, the name of the csv-file.
+
+    Returns
+    -------
+    null
+    """
     # Make the z1 z2 into on matrix
     a = np.array(np.array([z1,z2]).T)
     
     # Save the matrix as a csv
+    name = name + '.csv'
     np.savetxt(name, a, delimiter=",")
+    
+    # Print sucess
+    print('The coordinates has been saved')
