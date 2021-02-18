@@ -221,7 +221,7 @@ def plot_frac(z1, z2, name):
     
     # Plot each fracture as a line
     for pos in range(len(X1)):
-        ax.plot([X1[0][pos],X2[0][pos]],[Y1[0][pos],Y2[0][pos]], color='black')
+        ax.plot([X1[0][pos],X2[0][pos]],[Y1[0][pos],Y2[0][pos]], color='black', lw=.5)
         f.value += 1 # signal to increment the progress bar
     f.bar_style = "success"
     
