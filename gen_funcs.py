@@ -49,7 +49,7 @@ def input_func():
         description='y-axis:',
         disabled=False,
         continuous_update=False,
-        orientation='horizontal',
+        orientation='vertical',
         readout=True,
         readout_format='.1f',
     )
@@ -214,6 +214,7 @@ def plot_frac(z1, z2, name):
     # Initiate figure
     fig = plt.figure()
     ax  = fig.add_subplot(111)
+    ax.axis('equal')
     
     # Setup progress bar
     f = widgets.IntProgress(min=0, max=len(X1), description="Plotting") # instantiate the bar
