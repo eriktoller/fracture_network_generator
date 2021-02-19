@@ -169,8 +169,9 @@ def collect_frac(n, xy_ax):
     z2 = np.zeros(n) + np.zeros(n)*1j
     
     # Setup progress bar
-    f = widgets.IntProgress(min=0, max=n, description="Generating") # instantiate the bar
+    f = widgets.IntProgress(min=0, max=100, description="Generating") # instantiate the bar
     display(f) # display the bar
+    f.value = 1
     
     # Iterator to find the nearest un-used point
     for pos in range(n):
@@ -179,8 +180,8 @@ def collect_frac(n, xy_ax):
         # Find the nearest neighboor, but exclude all z that has been assigned as z1
         pos_min = np.where(dist[pos] == np.min(np.delete(dist[pos], np.arange(pos+1))))
         z2[pos] += z[pos_min]
-        # update the bar
-        f.value += 1 # signal to increment the progress bar
+        if int(pos/n*100) > f.value-1: # only update 100 time and not n times
+            f.value += 1 # signal to increment the progress bar
     f.bar_style = "success"
     
     # Check if any x-positions are outside the boundary and if so move them to the boundary
@@ -217,22 +218,22 @@ def plot_frac(z1, z2, name):
     ax.axis('equal')
     
     # Setup progress bar
-    f = widgets.IntProgress(min=0, max=len(X1), description="Plotting") # instantiate the bar
+    f = widgets.IntProgress(min=0, max=len(X1)*0+100, description="Plotting") # instantiate the bar
     display(f) # display the bar
+    f.value = 1
     
     # Plot each fracture as a line
     for pos in range(len(X1)):
         ax.plot([X1[0][pos],X2[0][pos]],[Y1[0][pos],Y2[0][pos]], color='black', lw=.5)
-        f.value += 1 # signal to increment the progress bar
+        if int(pos/len(X1)*100) > f.value-1: # only update 100 time and not n times
+            f.value += 1 # signal to increment the progress bar
     f.bar_style = "success"
     
     # Turn off the axis and show the plot
     plt.axis('off')
     plt.show()
     
-    # Save the figure as pdf
-    name = name + '_fractue_network.pdf'
-    fig.savefig(name, format='pdf', bbox_inches='tight')
+    return fig
     
     
 def plot_length(z1, z2, name):
@@ -269,9 +270,7 @@ def plot_length(z1, z2, name):
     ax.get_yaxis().set_ticks([])
     plt.show()
     
-    # Save the figure as pdf
-    name = name + '_length_distrib.pdf'
-    fig.savefig(name, format='pdf', bbox_inches='tight')
+    return fig
     
 def save_frac(z1,z2,name):
     """
@@ -298,3 +297,24 @@ def save_frac(z1,z2,name):
     
     # Print sucess
     print('The coordinates has been saved')
+    
+def save_fig(fig, name):
+    """
+    save_fig(fig, name)
+    
+    Saves a figure as a pdf.
+    
+    Parameters
+    ----------
+    fig: figure, the figure object
+    name: string, the name of the csv-file.
+
+    Returns
+    -------
+    null
+    """
+    # Save the figure as pdf
+    fig.savefig(name, format='pdf', bbox_inches='tight')
+    
+    # Print sucess
+    print('A figure has been saved as ', name, '.')
